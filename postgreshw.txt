@@ -1,0 +1,141 @@
+Postgres
+select * from actor;
+select first_name, actor_id from actor;
+select DISTINCT district from address;
+select COUNT(DISTINCT district) from address;
+SELECT first_name || ' ' || last_name, actor_id FROM actor;
+SELECT 5 * 3;
+SELECT column_name alias_name FROM table_name;
+SELECT first_name, last_name AS surname FROM customer;
+SELECT first_name || ' ' || last_name "full name"
+FROM customer;
+SELECT film_id, title, rental_rate INTO TABLE film_r
+FROM film WHERE rating = 'R' AND rental_duration = 5
+ORDER BY title;
+SELECT film_id, title, length INTO TEMP TABLE short_film FROM film WHERE length < 60 ORDER BY title;
+SELECT film_id, title, release_year FROM film
+ORDER BY film_id LIMIT 5;
+SELECT film_id, title, release_year FROM film
+ORDER BY film_id LIMIT 4 OFFSET 3;
+SELECT film_id, title FROM film ORDER BY title 
+OFFSET 5 ROWS FETCH FIRST 5 ROW ONLY; 
+SELECT customer_id, first_name, last_name FROM customer WHERE customer_id IN (SELECT customer_id
+FROM rental WHERE CAST (return_date AS DATE) = '2005-05-27') ORDER BY customer_id;
+SELECT customer_id, payment_id, amount, payment_date FROM payment WHERE payment_date BETWEEN '2007-02-07' AND '2007-02-15';
+SELECT first_name, last_name FROM customer
+WHERE first_name ILIKE 'BAR%';
+SELECT first_name, last_name, email, picture
+FROM staff WHERE picture IS NULL;
+SELECT c.customer_id, first_name, amount, payment_date FROM customer c INNER JOIN payment p 
+ON p.customer_id = c.customer_id ORDER BY payment_date DESC;
+SELECT a.first_name staff, o .first_name store FROM staff a INNER JOIN staff o ON o.staff_id = a.store_id
+ORDER BY store;       ——20
+CREATE TABLE basket_a (a INT PRIMARY KEY,
+ fruit_a VARCHAR (100) NOT NULL);
+CREATE TABLE basket_b (b INT PRIMARY KEY,
+ fruit_b VARCHAR (100) NOT NULL);
+INSERT INTO basket_a (a, fruit_a)
+VALUES (1, 'Apple'), (2, 'Orange'), (3, 'Banana'),
+(4, 'Cucumber');
+INSERT INTO basket_b (b, fruit_b) VALUES (1, 'Orange'),
+(2, 'Apple'), (3, 'Watermelon'), (4, 'Pear');
+SELECT a, fruit_a, b, fruit_b FROM basket_a
+INNER JOIN basket_b ON fruit_a = fruit_b;
+SELECT a, fruit_a, b, fruit_b FROM basket_a
+LEFT JOIN basket_b  ON fruit_a = fruit_b;
+SELECT a, fruit_a, b, fruit_b FROM basket_a
+LEFT JOIN basket_b ON fruit_a = fruit_b
+WHERE b IS NULL;
+SELECT a, fruit_a, b, fruit_b FROM basket_a
+RIGHT JOIN basket_b ON fruit_a = fruit_b;
+SELECT a, fruit_a, b, fruit_b FROM basket_a
+RIGHT JOIN basket_b ON fruit_a = fruit_b
+WHERE a IS NULL;
+SELECT a, fruit_a, b, fruit_b FROM basket_a FULL OUTER JOIN basket_b ON fruit_a = fruit_b;
+SELECT a, fruit_a, b, fruit_b FROM basket_a
+FULL JOIN basket_b  ON fruit_a = fruit_b
+WHERE a IS NULL OR b IS NULL;     —-31
+CREATE TABLE T1 (label CHAR(1) PRIMARY KEY);
+CREATE TABLE T2 (score INT PRIMARY KEY);
+INSERT INTO T1 (label)VALUES ('A'), ('B');
+INSERT INTO T2 (score)VALUES (1), (2), (3); 
+SELECT * FROM T1 CROSS JOIN T2;  ——36
+CREATE TABLE categories (
+	category_id serial PRIMARY KEY,
+	category_name VARCHAR (255) NOT NULL
+);
+
+CREATE TABLE products (
+	product_id serial PRIMARY KEY,
+	product_name VARCHAR (255) NOT NULL,
+	category_id INT NOT NULL,
+	FOREIGN KEY (category_id) REFERENCES categories (category_id)
+);
+INSERT INTO categories (category_name)
+VALUES
+	('Smart Phone'),
+	('Laptop'),
+	('Tablet');
+
+INSERT INTO products (product_name, category_id)
+VALUES
+	('iPhone', 1),
+	('Samsung Galaxy', 1),
+	('HP Elite', 2),
+	('Lenovo Thinkpad', 2),
+	('iPad', 3),
+	('Kindle Fire', 3);
+SELECT
+	*
+FROM
+	products
+NATURAL JOIN categories; 
+
+SELECT
+   customer_id
+FROM
+   payment
+GROUP BY
+   customer_id; 
+SELECT
+	customer_id,
+	SUM (amount)
+FROM
+	payment
+GROUP BY
+	customer_id;
+SELECT
+	staff_id,
+	COUNT (payment_id)
+FROM
+	payment
+GROUP BY
+	staff_id;
+SELECT 
+	customer_id, 
+	staff_id, 
+	SUM(amount) 
+FROM 
+	payment
+GROUP BY 
+	staff_id, 
+	customer_id
+ORDER BY 
+    customer_id;
+SELECT 
+	DATE(payment_date) paid_date, 
+	SUM(amount) sum
+FROM 
+	payment
+GROUP BY
+	DATE(payment_date);
+SELECT
+	customer_id,
+	SUM (amount)
+FROM
+	payment
+GROUP BY
+	customer_id
+HAVING
+	SUM (amount) > 200; ——47
+
